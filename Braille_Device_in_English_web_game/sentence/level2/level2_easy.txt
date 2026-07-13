@@ -1,0 +1,5 @@
+3 cats
+10 dogs
+5 birds
+2 frogs
+7 stars

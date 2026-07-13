@@ -1,0 +1,10 @@
+cat
+dog
+sun
+frog
+lamp
+kite
+book
+fish
+star
+milk
