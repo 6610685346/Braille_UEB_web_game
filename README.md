@@ -32,5 +32,5 @@
 
 ### [Backspace] → delete (practice only)
 
-###[Enter] → confirm (practice only)
+### [Enter] → confirm (practice only)
 
