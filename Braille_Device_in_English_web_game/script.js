@@ -2043,7 +2043,7 @@ function renderFreeWriteContent() {
         i++;
     }
 
-    const bufSpan = bufStr ? `<span style="color:#5c99f5;border-bottom:2px dashed #5c99f5">${bufStr}</span>` : "";
+    const bufSpan = bufStr ? `<span style="color:#5c99f5;border-bottom:2px dashed #5c99f5">${escapeHtml(bufStr)}</span>` : "";
     const container = document.getElementById('words-container');
     container.innerHTML = freeWriteText + bufSpan + '<span class="cursor-blink"></span>';
     container.scrollTop = container.scrollHeight;
