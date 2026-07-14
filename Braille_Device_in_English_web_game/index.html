@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Braille Blitz - Point Challenge</title>
+
+    <!------------------------------->
+    <!-- Link to external CSS file -->
+    <!------------------------------->
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <div class="game-container">
+            <div class="stats-bar" id="stats-container" style="display: none;">
+                <div>score: <span id="score">0</span> <span id="multiplier-ui" class="streak-badge">1x</span></div>
+                <div>time: <span id="timer">45</span></div>
+
+                <!----------------------------->
+                <!------MUSIC CONTROL UI------->
+                <!----------------------------->
+
+                <div id="music-bar" style="
+    position:fixed; bottom:16px; right:16px; z-index:9999;
+    background:#fff; border:1px solid #ddd; border-radius:24px;
+    padding:6px 12px; display:flex; align-items:center; gap:8px;
+    box-shadow:0 2px 12px rgba(0,0,0,0.12); font-size:0.85rem;">
+
+                    <button onclick="toggleMusic()" id="music-btn"
+                        style="background:none; border:none; cursor:pointer; font-size:1.1rem; opacity:0.5;"
+                        title="Play/Pause">⏸</button>
+
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.4" style="width:60px;"
+                        oninput="setVolume(this.value)" title="Volume">
+
+                    <select id="song-select" onchange="selectSong(this.value)"
+                        style="font-size:0.78rem; border:none; background:transparent; cursor:pointer; max-width:110px;"></select>
+                </div>
+            </div>
+            <div id="combo-bar-wrapper" style="display:none;">
+                <div class="combo-bar-track">
+                    <div class="combo-bar-fill" id="combo-bar-fill"></div>
+                </div>
+                <div class="combo-bar-label" id="combo-bar-label">streak 0</div>
+            </div>
+
+            <div id="game-screen" style="display: none;">
+
+                <!-------------------------->
+                <!------PRACTICE MODE------->
+                <!-------------------------->
+
+                <div id="practice-word-prompt" style="display:none; text-align:center; margin-bottom:14px;">
+                    <div id="practice-word-target"
+                        style="font-family:monospace; font-size:2.6rem; font-weight:800; color:#38240D; letter-spacing:2px;">
+                    </div>
+                </div>
+
+                <div class="word-display" id="words-container"></div>
+
+                <div id="practice-key-display" style="display:flex; gap:8px; justify-content:center; margin:12px 0;">
+                    <div id="key-s" class="practice-key">S</div>
+                    <div id="key-d" class="practice-key">D</div>
+                    <div id="key-f" class="practice-key">F</div>
+                    <div id="key-j" class="practice-key">J</div>
+                    <div id="key-k" class="practice-key">K</div>
+                    <div id="key-l" class="practice-key">L</div>
+                </div>
+
+                <button id="practice-exit-btn" style="display:none; margin:15px auto; display:block;"
+                    onclick="endGame()" class="btn">exit</button>
+
+                <!-------------------------->
+                <!-- HIGHWAY (timed mode) -->
+                <!-------------------------->
+
+                <div id="note-highway-wrapper" style="display:none; position:relative; margin-bottom:12px;">
+
+                    <div id="note-highway">
+
+                        <div class="lane-div" style="left:16.66%"></div>
+                        <div class="lane-div" style="left:33.33%"></div>
+                        <div class="lane-div" style="left:50%"></div>
+                        <div class="lane-div" style="left:66.66%"></div>
+                        <div class="lane-div" style="left:83.33%"></div>
+
+                        <!---------------------------->
+                        <!-- locked zone - no input -->
+                        <!---------------------------->
+
+                        <div style="position:absolute;left:0;right:0;top:0%;height:25%;
+                        background:rgba(202,71,84,0.08);pointer-events:none;"></div>
+
+                        <!--------------------->
+                        <!-- fast zone 10pts -->
+                        <!--------------------->
+
+                        <div style="position:absolute;left:0;right:0;top:25%;height:35%;
+                        background:rgba(192,88,0,0.08);pointer-events:none;"></div>
+
+                        <!------------------->
+                        <!-- mid zone 5pts -->
+                        <!------------------->
+
+                        <div style="position:absolute;left:0;right:0;top:60%;height:30%;
+                        background:rgba(92,153,245,0.08);pointer-events:none;"></div>
+
+                        <!------------------->
+                        <!-- late zone 1pt -->
+                        <!------------------->
+
+                        <div style="position:absolute;left:0;right:0;top:90%;height:10%;
+                        background:rgba(202,71,84,0.15);pointer-events:none;"></div>
+
+                        <!------------------>
+                        <!-- falling note -->
+                        <!------------------>
+
+                        <div id="falling-note"></div>
+
+                        <!-------------------->
+                        <!-- judgment flash -->
+                        <!-------------------->
+
+                        <div id="judgment-text" style="
+            position:absolute;left:0;right:0;top:42%;
+            text-align:center;opacity:0;pointer-events:none;
+            transition:opacity 0.15s ease;
+            font-size:1.3rem;font-weight:700;letter-spacing:3px;"></div>
+
+                        <div id="bg-letter" style="
+                            position:absolute; top:35%; left:50%;
+                            transform:translate(-50%,-50%);
+                            font-size:8rem; font-weight:900;
+                            font-family:monospace;
+                            pointer-events:none;
+                            user-select:none;
+                            z-index:1;">
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div id="menu-screen">
+
+                <!------------------>
+                <!----MAIN MENU----->
+                <!------------------>
+
+                <div id="screen-main">
+                    <h1 style="color:#38240D; font-size:2.5rem; margin:0 0 6px;">Braille Blitz</h1>
+                    <p style="margin-bottom:30px;">A typing game for Unified English Braille</p>
+                    <button class="btn" onclick="showScreen('screen-grade')">start</button>
+                </div>
+
+                <!-------------------->
+                <!----GRADE SELECT---->
+                <!-------------------->
+
+                <div id="screen-grade" style="display:none;">
+                    <h2 style="color:#38240D; margin:0 0 6px;">Select Braille Grade</h2>
+                    <div class="mode-cards">
+                        <div class="mode-card right" onclick="selectGradeAndNext(1)">
+                            <div class="mode-card-title">Grade 1</div>
+                            <div class="mode-card-desc">Letters, numbers &amp; punctuation</div>
+                        </div>
+                        <div class="mode-card right" onclick="selectGradeAndNext(2)">
+                            <div class="mode-card-title">Grade 1 + 2</div>
+                            <div class="mode-card-desc">Full UEB with everything</div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="showScreen('screen-main')">back</button>
+                </div>
+
+                <!-------------------->
+                <!-----MODE SELECT---->
+                <!-------------------->
+
+                <div id="screen-mode" style="display:none;">
+                    <h2 id="select-mode-title" style="color:#38240D; margin:0 0 6px;">Select Mode</h2>
+                    <div class="mode-cards">
+                        <div class="mode-card right" onclick="selectModeAndNext('timed')">
+                            <div class="mode-card-title">Play Game</div>
+                            <div class="mode-card-desc">Race against the clock <br>Earn points and combos <br></div>
+                        </div>
+                        <div class="mode-card right" onclick="selectModeAndNext('practice')">
+                            <div class="mode-card-title">Practice</div>
+                            <div class="mode-card-desc">Free type with <br>answer sheet</div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="showScreen('screen-grade')">back</button>
+                </div>
+
+                <!-------------------->
+                <!----LEVEL SELECT---->
+                <!-------------------->
+
+                <div id="screen-level" style="display:none;">
+                    <h2 style="color:#38240D; margin:0 0 6px;">Select Level</h2>
+                    <p class="screen-subtitle" style="color:#555; margin-bottom:20px; font-size:0.9rem;">Each level
+                        introduces new patterns</p>
+                    <div class="level-cards" id="level-cards-container"></div>
+                    <button class="btn" onclick="showScreen('screen-mode')">back</button>
+                </div>
+
+                <!-------------------->
+                <!-- END GAME STATS -->
+                <!-------------------->
+
+                <div id="end-game-stats" style="display:none;">
+                    <h2 id="results-title" style="color:#38240D; margin:0 0 20px;">Results</h2>
+
+                    <div class="results-dashboard"
+                        style="flex-direction:column; gap:0; border-radius:10px; padding:20px; margin:0 0 8px;">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1);">
+                            <span style="font-size:0.85rem; color:#fff; text-transform:uppercase; letter-spacing:1px;"
+                                id="panel-score-label">score</span>
+                            <span style="font-family:monospace; font-size:2rem; font-weight:bold; color:#69d249;"
+                                id="final-score-val">0</span>
+                        </div>
+
+                        <div id="mult-panel-box"
+                            style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1);">
+                            <span
+                                style="font-size:0.85rem; color:#fff; text-transform:uppercase; letter-spacing:1px;">best
+                                combo</span>
+                            <span style="font-family:monospace; font-size:2rem; font-weight:bold; color:#C05800;"
+                                id="final-mult-val">1x</span>
+                        </div>
+
+                        <div id="rank-panel-box"
+                            style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1);">
+                            <span
+                                style="font-size:0.85rem; color:#fff; text-transform:uppercase; letter-spacing:1px;">rank</span>
+                            <span style="font-family:monospace; font-size:2rem; font-weight:bold; color:#ca4754;"
+                                id="final-rank-val">F</span>
+                        </div>
+
+                        <div id="judgment-panel" style="display:none; flex-direction:column;">
+
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1);">
+                                <span
+                                    style="font-size:0.85rem; color:#fff; text-transform:uppercase; letter-spacing:1px;">accuracy</span>
+                                <span style="font-family:monospace; font-size:2rem; font-weight:bold; color:#3182ce;"
+                                    id="final-perfect-val">0%</span>
+                            </div>
+
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1);">
+                                <span
+                                    style="font-size:0.85rem; color:#fff; text-transform:uppercase; letter-spacing:1px;">
+                                    <span
+                                        style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#48bb78; margin-right:6px;"></span>good
+                                </span>
+                                <span style="font-family:monospace; font-size:2rem; font-weight:bold; color:#48bb78;"
+                                    id="final-good-val">0</span>
+                            </div>
+
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; padding:10px 0;">
+                                <span
+                                    style="font-size:0.85rem; color:#fff; text-transform:uppercase; letter-spacing:1px;">
+                                    <span
+                                        style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#ca4754; margin-right:6px;"></span>miss
+                                </span>
+                                <span style="font-family:monospace; font-size:2rem; font-weight:bold; color:#ca4754;"
+                                    id="final-miss-val">0</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div id="unlock-banner" style="display:none;" class="unlock-banner">
+                        Level <span id="unlock-level-name"></span> unlocked!
+                    </div>
+                    <div style="display:flex; gap:12px; justify-content:center; margin-top:20px; flex-wrap:wrap;">
+                        <button class="btn" onclick="replayLevel()" id="replay-btn">replay</button>
+                        <button class="btn" id="next-level-btn" style="display:none;" onclick="goToNextLevel()">next
+                            level</button>
+                        <button class="btn" id="levels-btn" onclick="goToLevelSelect()">return</button>
+                        <button class="btn" id="return-btn" style="display:none;"
+                            onclick="showScreen('screen-mode')">return</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-------------------->
+            <!-- CONTROL PAGE----->
+            <!-------------------->
+
+            <div id="controls-overlay" class="overlay-screen" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(56,36,13,0.92); z-index:200; color:white;
+    display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px;">
+                <div style="font-size:2rem; font-weight:bold;">Controls</div>
+
+                <div class="overlay-content-box"
+                    style="background:#C05800; border-radius:12px; padding:24px; display:flex; flex-direction:column; gap:12px; font-family:monospace;font-size:1.2rem;">
+                    <div><strong>[S] [D] [F] + [J] [K] [L]</strong> → type a braille cell</div>
+                    <div><strong>[Space]</strong> → next word</div>
+                    <div><strong>[Esc]</strong> → pause / menu</div>
+                    <div><strong>[Backspace]</strong> → delete (practice only)</div>
+                    <div><strong>[Enter]</strong> → confirm (practice only)</div>
+                </div>
+
+                <button class="btn" onclick="toggleControlsOverlay()">close</button>
+            </div>
+
+            <!------------------------>
+            <!---HOW TO PLAY PAGE----->
+            <!------------------------>
+
+            <div id="howtoplay-overlay" class="overlay-screen" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(56,36,13,0.92); z-index:200; color:white;
+    flex-direction:column; align-items:center; justify-content:flex-end; padding:45px; gap:16px;">
+                <div style="font-size:2rem; font-weight:bold;">How to Play</div>
+
+                <div class="overlay-content-box"
+                    style="background:#C05800; border-radius:12px; padding:24px; display:flex; flex-direction:column; gap:12px; font-size:1.2rem; max-width:500px;text-align:left;">
+
+                    <div style="text-align:center;"><strong> The Game </strong></div>
+
+                    <div><strong> Orange zone</strong> hit the chord when the note is in the orange zone to
+                        get 10 points</div>
+                    <div><strong>Blue zone</strong> hit the chord in the blue zone to get 5 points </div>
+                    <div><strong>If you Miss</strong> the same note falls again and the next correct input will get no
+                        point</div>
+                    <div>Try to <strong>remember</strong> the chord and hit all the keys <strong>at once</strong>
+                        correctly to advance
+                    </div>
+
+                    <div style="text-align:center;"><strong> Practice mode </strong></div>
+
+                    <div>Use the reference sheet to practice the chords</div>
+                    <div>A practice word is given in braille type it and hit <strong>Space</strong> to confirm</div>
+                    <div>The word only changes if you got it <strong>right</strong></div>
+                    <div>Use <strong>Backspace</strong> to delete in practice mode</div>
+                </div>
+
+                <button class="btn" onclick="toggleHowToPlayOverlay()">close</button>
+            </div>
+        </div>
+
+        <!----------------------->
+        <!---Reference Sheet----->
+        <!----------------------->
+
+        <div class="cheat-sheet-sidebar" id="braille-cheat-sheet">
+            <h3 class="cheat-sheet-title">Braille Reference</h3>
+            <div class="cheat-grid" id="cheat-grid-container"></div>
+        </div>
+    </div>
+
+    <!-------------------------------------->
+    <!-- Link to external JavaScript file -->
+    <!-------------------------------------->
+
+    <script src="script.js"></script>
+
+    <div id="levelup-popup">LEVEL UP!</div>
+
+    <!-------------------->
+    <!-- CONTROL BUTTON -->
+    <!-------------------->
+
+    <button onclick="toggleControlsOverlay()" style="
+    position:fixed; bottom:16px; left:16px; z-index:9999;
+    background:#291301; color:white; border:none; border-radius:24px;
+    padding:8px 16px; cursor:pointer; font-size:1.2rem;
+    box-shadow:0 2px 12px rgba(0,0,0,0.12);">
+        controls
+    </button>
+
+    <!------------------------>
+    <!---HOW TO PLAY BUTTON--->
+    <!------------------------>
+
+    <button onclick="toggleHowToPlayOverlay()" style="
+    position:fixed; bottom:16px; left:130px; z-index:9999;
+    background:#291301; color:white; border:none; border-radius:24px;
+    padding:8px 16px; cursor:pointer; font-size:1.2rem;
+    box-shadow:0 2px 12px rgba(0,0,0,0.12);">how to play
+    </button>
+
+    <!------------------------>
+    <!----NIGH MODE BUTTON---->
+    <!------------------------>
+
+    <button id="night-mode-btn" onclick="toggleNightMode()" style="
+    position:fixed; top:16px; right:16px; z-index:9999;
+    background:#291301; color:white; border:none; border-radius:24px;
+    padding:8px 16px; cursor:pointer; font-size:1rem; font-weight:bold;
+    box-shadow:0 2px 12px rgba(0,0,0,0.12);">dark</button>
+
+
+</body>
+
+</html>

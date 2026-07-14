@@ -1,0 +1,6 @@
+wait (stop)
+wait...
+«stop»
+is that you?
+yes, it is!
+hello!
