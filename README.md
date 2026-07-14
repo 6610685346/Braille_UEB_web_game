@@ -2,7 +2,7 @@
 
 ##The Game
 
-###Orange zone hit the chord when the note is in the orange zone to get 10 points
++++Orange zone hit the chord when the note is in the orange zone to get 10 points
 
 ###Blue zone hit the chord in the blue zone to get 5 points
 
