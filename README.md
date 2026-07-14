@@ -1,35 +1,36 @@
 # Braille_UEB_web_game
 
-#The Game
+##The Game
 
-#Orange zone hit the chord when the note is in the orange zone to get 10 points
+###Orange zone hit the chord when the note is in the orange zone to get 10 points
 
-#Blue zone hit the chord in the blue zone to get 5 points
+###Blue zone hit the chord in the blue zone to get 5 points
 
-#If you Miss the same note falls again and the next correct input will get no point
+###If you Miss the same note falls again and the next correct input will get no point
 
-#Try to remember the chord and hit all the keys at once correctly to advance
-
-
-#Practice mode
-#Use the reference sheet to practice the chords
-
-#A practice word is given in braille type it and hit Space to confirm
-
-#The word only changes if you got it right
-
-#Use Backspace to delete in practice mode
+###Try to remember the chord and hit all the keys at once correctly to advance
 
 
-#Controls
+##Practice mode
 
-#[S] [D] [F] + [J] [K] [L] → type a braille cell
+###Use the reference sheet to practice the chords
 
-#[Space] → next word
+###A practice word is given in braille type it and hit Space to confirm
 
-#[Esc] → pause / menu
+###The word only changes if you got it right
 
-#[Backspace] → delete (practice only)
+###Use Backspace to delete in practice mode
 
-#[Enter] → confirm (practice only)
+
+##Controls
+
+###[S] [D] [F] + [J] [K] [L] → type a braille cell
+
+###[Space] → next word
+
+###[Esc] → pause / menu
+
+###[Backspace] → delete (practice only)
+
+###[Enter] → confirm (practice only)
 
