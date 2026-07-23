@@ -6,20 +6,20 @@ const keyMap = { 'f': 0, 'd': 1, 's': 2, 'j': 3, 'k': 4, 'l': 5 };
 const PERFECT_ZONE = { top: 0.70, bot: 0.95 };
 const GOOD_ZONE = { top: 0.55, bot: 0.99 };
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const g1SymbolIndicator = [false, false, false, false, true, true]; // dots 56
-const g1WordIndicator = [false, false, false, false, true, true]; // dots 56
-const g1PassageIndicator = [false, false, false, false, true, true]; // dots 56
-const g1Terminator = [false, false, true, false, false, false]; // dot 3
-const numTerminatorPattern = [false, true, false, false, false, false]; // dot 4 = ⠄
-const currencyIndicatorPattern = [false, false, false, true, false, false]; // dot 4 (⠈) — currency prefix
-const dashPattern = [false, false, true, false, false, true]; // dots 3, 6 — correct hyphen pattern
-const underscorePrefixPattern = [false, false, false, true, false, true]; // dots 4,6
-const lineContinuationPattern = [false, false, false, true, false, false]; // dot 4
-const dot6OnlyPattern = [false, false, false, false, false, true]; // dot 6
-const solidusPattern = [false, false, true, true, false, false]; // dots 3,4
-const dashPrefixPattern = [false, false, false, false, false, true]; // dot 6 (⠠)
-const openBracketPattern = [true, true, false, false, false, true];   // ⠣ dots 1,2,6
-const closeBracketPattern = [false, false, true, true, true, false];  // ⠜ dots 3,4,5
+const g1SymbolIndicator = [false, false, false, false, true, true];
+const g1WordIndicator = [false, false, false, false, true, true];
+const g1PassageIndicator = [false, false, false, false, true, true];
+const g1Terminator = [false, false, true, false, false, false];
+const numTerminatorPattern = [false, true, false, false, false, false];
+const currencyIndicatorPattern = [false, false, false, true, false, false];
+const dashPattern = [false, false, true, false, false, true];
+const underscorePrefixPattern = [false, false, false, true, false, true];
+const lineContinuationPattern = [false, false, false, true, false, false];
+const dot6OnlyPattern = [false, false, false, false, false, true];
+const solidusPattern = [false, false, true, true, false, false];
+const dashPrefixPattern = [false, false, false, false, false, true];
+const openBracketPattern = [true, true, false, false, false, true];
+const closeBracketPattern = [false, false, true, true, true, false];
 const backslashPattern = [true, false, false, false, false, true];
 const primePattern = [false, true, true, false, true, true];
 
@@ -123,7 +123,7 @@ const brailleAlphabet = {
 };
 
 const dquoteOpenPattern = brailleAlphabet['?'];
-const dquoteClosePattern = [false, false, true, false, true, true];  // ⠴ dots 356
+const dquoteClosePattern = [false, false, true, false, true, true];
 
 const brailleNumbers = {
     '1': brailleAlphabet['a'], '2': brailleAlphabet['b'], '3': brailleAlphabet['c'],
@@ -196,18 +196,18 @@ const g2WholeWords = {
     "it": { pattern: brailleAlphabet['x'] }, "you": { pattern: brailleAlphabet['y'] },
     "as": { pattern: brailleAlphabet['z'] },
 
-    "child": { pattern: [true, false, false, false, false, true] }, // Dots 1, 6 (ch)
-    "out": { pattern: [true, true, false, false, true, true] },     // Dots 1, 2, 5, 6 (ou)
-    "shall": { pattern: [true, false, false, true, false, true] },   // Dots 1, 4, 6 (sh)
-    "still": { pattern: [false, false, true, true, false, false] },  // Dots 3, 4 (st)
-    "this": { pattern: [true, false, false, true, true, true] },    // Dots 1, 4, 5, 6 (th)
-    "which": { pattern: [true, false, false, false, true, true] },   // Dots 1, 5, 6 (wh)
-    "be": { pattern: [false, true, true, false, false, false] },     // Dots 2, 3
-    "enough": { pattern: [false, true, false, false, false, true] }, // Dots 2, 6 (en)
-    "were": { pattern: [false, true, true, false, true, true] },     // Dots 2, 3, 5, 6 (gg)
-    "his": { pattern: [false, true, true, false, false, true] },    // Dots 2, 3, 6
-    "in": { pattern: [false, false, true, false, true, false] },     // Dots 3, 5
-    "was": { pattern: [false, false, true, false, true, true] },    // Dots 3, 5, 6
+    "child": { pattern: [true, false, false, false, false, true] },
+    "out": { pattern: [true, true, false, false, true, true] },
+    "shall": { pattern: [true, false, false, true, false, true] },
+    "still": { pattern: [false, false, true, true, false, false] },
+    "this": { pattern: [true, false, false, true, true, true] },
+    "which": { pattern: [true, false, false, false, true, true] },
+    "be": { pattern: [false, true, true, false, false, false] },
+    "enough": { pattern: [false, true, false, false, false, true] },
+    "were": { pattern: [false, true, true, false, true, true] },
+    "his": { pattern: [false, true, true, false, false, true] },
+    "in": { pattern: [false, false, true, false, true, false] },
+    "was": { pattern: [false, false, true, false, true, true] },
 
     "day": { prefix: PREFIXES.dot5, pattern: brailleAlphabet['d'] },
     "ever": { prefix: PREFIXES.dot5, pattern: brailleAlphabet['e'] },
@@ -492,9 +492,13 @@ function pushCapitalRun(sequence, capRun) {
     }
 }
 
+
+
 //------------------//
 //-----TOKENIZER------
 //------------------//
+
+
 
 function tokenizeGrade2(text) {
 
@@ -603,8 +607,6 @@ function tokenizeGrade2(text) {
             const prevIsLetter = /[a-zA-Z]/.test(text[i - 1] || "");
             const nextIsLetter = /[a-zA-Z]/.test(text[i + 1] || "");
             const standingAlone = !prevIsLetter && !nextIsLetter;
-            // curly quotes are explicitly directional — trust that over the toggle;
-            // only the direction-less straight " needs the toggle heuristic
             const isOpenSemantic = text[i] === '\u201C' ? true
                 : text[i] === '\u201D' ? false
                     : quoteOpenState;
@@ -927,6 +929,10 @@ function tokenizeGrade2(text) {
     return sequence;
 }
 
+
+
+
+
 function tokenizeGrade1(text) {
 
     // 6.9 — numeric passage: [[...]] sets numeric mode until terminator
@@ -1212,6 +1218,8 @@ function tokenizeGrade1(text) {
     }
     return sequence;
 }
+
+
 
 //------------------------//
 //-----REFERENCE SHEET------
@@ -1579,9 +1587,9 @@ function startCountdown(callback) {
         if (i < steps.length) {
             countdownTimeouts.push(setTimeout(tick, 800));
         } else {
-            countdownTimeouts.push(setTimeout(() => {       // ← track it
+            countdownTimeouts.push(setTimeout(() => {    //track it
                 overlay.remove();
-                if (isPlaying) callback();  // ← only fire if still playing
+                if (isPlaying) callback();  //only fire if still playing
             }, 600));
         }
     }
